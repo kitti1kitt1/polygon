@@ -1,0 +1,114 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+
+void BubbleSort(std::vector<int>& arr) {
+    int n = arr.size();
+
+    // Внешний цикл, отвечающий за количество проходов по массиву
+    for (int i = 0; i < n - 1; i++) {
+        bool swapped = false; // Отслеживаем, был ли произведён обмен
+
+        // Внутренний цикл для сравнения соседних элементов
+        for (int j = 0; j < n - i - 1; j++) {
+            // Сравниваем соседние элементы
+            if (arr[j] > arr[j + 1]) {
+                // Меняем их местами, если они идут в неправильном порядке
+                std::swap(arr[j], arr[j + 1]);
+                swapped = true; // Помечаем, что был сделан обмен
+            }
+        }
+        // Если обменов не было, значит массив отсортирован
+        if (not swapped) {
+            break;
+        }
+    }
+}
+
+// Функция для разделения массива
+int Partition(std::vector<int>& arr, int low, int high) {
+    int pivot = arr[high]; // Опорный элемент (обычно последний элемент)
+    int i = low - 1;       // Индекс меньшего элемента
+
+    for (int j = low; j < high; j++) {
+        // Если текущий элемент меньше или равен опорному
+        if (arr[j] <= pivot) {
+            i++; // Увеличиваем индекс меньшего элемента
+            std::swap(arr[i], arr[j]);
+        }
+    }
+
+    // Меняем опорный элемент с элементом, который находится сразу после меньших элементов
+    std::swap(arr[i + 1], arr[high]);
+    return (i + 1); // Возвращаем индекс опорного элемента
+}
+
+// Рекурсивная функция для быстрой сортировки
+void QuickSort(std::vector<int>& arr, int low, int high) {
+    if (low < high) {
+        // Индекс опорного элемента
+        int pi = Partition(arr, low, high);
+
+        // Рекурсивно сортируем элементы до и после разделения
+        QuickSort(arr, low, pi - 1);
+        QuickSort(arr, pi + 1, high);
+    }
+}
+
+// функция Bucket Sort
+void BucketSort(std::vector<int>& arr) {
+    if (arr.empty()) return;
+
+    int minVal = *std::min_element(arr.begin(), arr.end());
+    int maxVal = *std::max_element(arr.begin(), arr.end());
+
+    int range = maxVal - minVal + 1;
+    // количество корзин и диапазон значений в корзине
+    int bucketCount = std::max(static_cast<int>(arr.size() / 10), 1);
+    int bucketRange = (range + bucketCount - 1) / bucketCount;
+
+    std::vector<std::vector<int>> buckets(bucketCount);
+    for (int num : arr) {
+        int bucketIndex = (num - minVal) / bucketRange;
+        buckets[bucketIndex].push_back(num);
+    }
+    for (auto& bucket : buckets) {
+        std::sort(bucket.begin(), bucket.end());
+    }
+    // Объединяем отсортированные корзины обратно в массив
+    int index = 0;
+    for (const auto& bucket : buckets) {
+        for (int num : bucket) {
+            arr[index++] = num;
+        }
+    }
+}
+
+int main() {
+    std::vector<int> test1 = { 8, 9, 3, 4, 2, 6, 4, 6, 4, 3, 5, 6 };
+    BubbleSort(test1);
+    std::cout << "BubbleSort result: ";
+    for (int i : test1) {
+        std::cout << i << " ";
+    }
+    std::cout << "\n";
+
+    std::vector<int> test2 = { 10, 7, 8, 9, 1, 5, 3, 6 };
+    QuickSort(test2, 0, test2.size() - 1);
+    std::cout << "QuickSort result: ";
+    for (int i : test2) {
+        std::cout << i << " ";
+    }
+    std::cout << "\n";
+
+    std::vector<int> test3 = { 10, 7, 8, 9, 1, 5, 3, 6 };
+    BucketSort(test3);
+    std::cout << "BucketSort result: ";
+    for (int i : test3) {
+        std::cout << i << " ";
+    }
+    std::cout << "\n";
+
+    return 0;
+}
